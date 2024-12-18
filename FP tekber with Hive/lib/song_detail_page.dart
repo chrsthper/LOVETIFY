@@ -15,14 +15,11 @@ class SongDetailPage extends StatelessWidget {
         TextEditingController(text: song.interpretation);
 
     void _saveChanges() {
-      final updatedSong = Song(
-        title: song.title,
-        artist: song.artist,
-        lyrics: _lyricsController.text,
-        interpretation: _interpretationController.text,
-      );
-      onEditSong(song.key, updatedSong); // Gunakan Hive key untuk identifikasi
-      Navigator.pop(context, updatedSong);
+      song
+        ..lyrics = _lyricsController.text
+        ..interpretation = _interpretationController.text;
+      song.save(); // Simpan perubahan langsung ke Hive
+      Navigator.pop(context, song); // Kembalikan lagu yang diperbarui
     }
 
     return Scaffold(
@@ -100,4 +97,3 @@ class SongDetailPage extends StatelessWidget {
     );
   }
 }
-
