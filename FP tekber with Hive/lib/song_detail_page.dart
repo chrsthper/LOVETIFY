@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'song.dart';
+import 'song_model.dart';
 
 class SongDetailPage extends StatelessWidget {
   final Song song;
@@ -11,18 +11,18 @@ class SongDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final TextEditingController _lyricsController =
         TextEditingController(text: song.lyrics);
-    final TextEditingController _translationController =
-        TextEditingController(text: song.translation);
+    final TextEditingController _interpretationController =
+        TextEditingController(text: song.interpretation);
 
     void _saveChanges() {
       final updatedSong = Song(
-        id: song.id,
         title: song.title,
+        artist: song.artist,
         lyrics: _lyricsController.text,
-        translation: _translationController.text,
+        interpretation: _interpretationController.text,
       );
-      onEditSong(song.id, updatedSong);
-      Navigator.pop(context);
+      onEditSong(song.key, updatedSong); // Gunakan Hive key untuk identifikasi
+      Navigator.pop(context, updatedSong);
     }
 
     return Scaffold(
@@ -47,7 +47,7 @@ class SongDetailPage extends StatelessWidget {
             SizedBox(height: 20),
             _buildSectionTitle('Interpretation'),
             SizedBox(height: 8),
-            _buildTextField(_translationController, 'Edit Interpretation'),
+            _buildTextField(_interpretationController, 'Edit Interpretation'),
             SizedBox(height: 30),
             Align(
               alignment: Alignment.bottomCenter,
@@ -100,3 +100,4 @@ class SongDetailPage extends StatelessWidget {
     );
   }
 }
+

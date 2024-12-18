@@ -22,4 +22,14 @@ class Song extends HiveObject {
     required this.lyrics,
     required this.interpretation,
   });
+
+  // Metode toJson untuk debugging
+  Map<String, dynamic> toJson() {
+    return {
+      'title': title,
+      'artist': artist,
+      'lyrics': lyrics,
+      'interpretation': interpretation,
+    };
+  }
 }

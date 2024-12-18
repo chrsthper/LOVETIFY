@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'song_model.dart';
+import 'song_detail_page.dart'; // Pastikan import ini benar
 
 class LibraryPage extends StatefulWidget {
   @override
@@ -70,7 +71,6 @@ class _LibraryPageState extends State<LibraryPage> {
                       try {
                         await songBox.add(newSong); // Simpan lagu ke Hive
                         print('Song added successfully: ${newSong.title}');
-                        print('All songs in Hive: ${songBox.values.toList()}');
                       } catch (e) {
                         print('Error adding song: $e');
                       }
@@ -140,20 +140,75 @@ class _LibraryPageState extends State<LibraryPage> {
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)),
                 child: ListTile(
-                  title: Text(song?.title ?? 'Unknown',
-                      style: TextStyle(
-                          color: Colors.white, fontWeight: FontWeight.bold)),
-                  subtitle: Text(song?.artist ?? 'Unknown',
-                      style: TextStyle(color: Colors.grey[400])),
-                  onTap: () {
-                    // Tampilkan detail lagu (bisa ditambahkan halaman detail)
-                  },
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete, color: Colors.redAccent),
-                    onPressed: () {
-                      box.deleteAt(index); // Hapus lagu dari Hive
+                  title: Text(
+                    song?.title ?? 'Unknown',
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(song?.artist ?? 'Unknown',
+                          style: TextStyle(color: Colors.grey[400])),
+                      Text(
+                        song?.interpretation ??
+                            'No interpretation available',
+                        style: TextStyle(
+                            color: Colors.grey[500],
+                            fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+                  onTap: () async {
+                    final updatedSong = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => SongDetailPage(
+                          song: song!,
+                          onEditSong: (String id, Song updatedSong) {
+                            songBox.putAt(index, updatedSong); // Update data di Hive
+                            setState(() {});
+                          },
+                        ),
+                      ),
+                    );
+
+                    if (updatedSong != null) {
                       setState(() {});
-                    },
+                    }
+                  },
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit, color: Colors.blueAccent),
+                        onPressed: () async {
+                          final updatedSong = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (ctx) => SongDetailPage(
+                                song: song!,
+                                onEditSong: (String id, Song updatedSong) {
+                                  songBox.putAt(index, updatedSong); // Update di Hive
+                                  setState(() {});
+                                },
+                              ),
+                            ),
+                          );
+
+                          if (updatedSong != null) {
+                            setState(() {});
+                          }
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.redAccent),
+                        onPressed: () {
+                          box.deleteAt(index); // Hapus dari Hive
+                          setState(() {}); // Refresh UI
+                        },
+                      ),
+                    ],
                   ),
                 ),
               );
